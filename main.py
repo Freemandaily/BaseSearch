@@ -6,11 +6,10 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# with open('key.json','r') as file:
-#     keys = json.load(file)
-#     bearerToken =keys['bearerToken']
+with open('key.json','r') as file:
+    keys = json.load(file)
+    bearerToken =keys['bearerToken']
 
-bearerToken = os.environ.get('bearerToken')
 client = tweepy.Client(bearer_token=bearerToken)
 app = FastAPI()
 
@@ -77,7 +76,10 @@ def TweetSearch(keywords:str):
     return users_tweet
 
 @app.get('/search/{query}')
-def search(query:str,limit:int = 10):
+def search(query:str,limit:int = 10,checkAlive:bool = False):
+    if checkAlive:
+        logging.info('Checking if Api is Alive')
+        return {'Status':200}
     logging.info('Requesting For Data')
     SearchedResult = TweetSearch(query)
     RequestedResult = list()
