@@ -1,4 +1,5 @@
 import tweepy,json,re,logging,os
+from datetime import datetime,timezone,timedelta
 from fastapi import FastAPI
 
 logging.basicConfig(
@@ -9,7 +10,7 @@ logging.basicConfig(
 # with open('key.json','r') as file:
 #     keys = json.load(file)
 #     bearerToken =keys['bearerToken']
-#
+
 bearerToken = os.environ.get('bearerToken')
 client = tweepy.Client(bearer_token=bearerToken)
 app = FastAPI()
@@ -36,11 +37,12 @@ def checkDuplicateUser(user_tweet,username,tweet_date):
 
 
 
-def TweetSearch(keywords:str):
+def TweetSearch(keywords:str,date):
     users_tweet = []
     try:
         for response in tweepy.Paginator(client.search_recent_tweets,
                                         keywords,
+                                        start_time=date,
                                         max_results=100,
                                         limit=5,
                                         user_fields=['public_metrics','username'],
@@ -57,8 +59,11 @@ def TweetSearch(keywords:str):
                 else:
                     continue
                 tweet_date = tweet.created_at.strftime("%Y-%m-%d %H:%M")
+                parsed_time = datetime.strptime(tweet_date,"%Y-%m-%d %H:%M")
+                new_time = parsed_time + timedelta(hours=1)
+                tweet_date = new_time.strftime("%Y-%m-%d %H:%M")
                 # Flter account with low followesr account Out
-                follower_threshold = 1000
+                follower_threshold = 100
                 if int(follower_count) < int(follower_threshold):
                     continue
                 users_tweet,affirm = checkDuplicateUser(users_tweet,username,tweet_date)
@@ -76,13 +81,17 @@ def TweetSearch(keywords:str):
         return e
     return users_tweet
 
-@app.get('/search/{query}')
-def search(query:str,limit:int = 10,checkAlive:bool = False):
+@app.get('/search/{query}/{date}')
+def search(query:str,date:str,limit:int = 10,checkAlive:bool = False):
     if checkAlive:
         logging.info('Checking if Api is Alive')
         return {'Status':200}
     logging.info('Requesting For Data')
-    SearchedResult = TweetSearch(query)
+    dt = datetime.fromisoformat(date)
+    dt_utc = dt.replace(tzinfo=timezone.utc)
+    print(dt_utc)
+    date = dt_utc.strftime('%Y-%m-%dT%H:%M:%SZ')
+    SearchedResult = TweetSearch(query,date)
     RequestedResult = list()
     for result in reversed(SearchedResult):
 
@@ -91,3 +100,4 @@ def search(query:str,limit:int = 10,checkAlive:bool = False):
         RequestedResult.append(result)
     logging.info('Retrieving Data')
     return RequestedResult
+
