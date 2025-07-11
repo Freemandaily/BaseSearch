@@ -1,0 +1,9 @@
+services:
+  type:web
+  name:BaseSearch
+  runtime:python
+  buildCommands: pip install -r requirements.txt
+  startCommand: "fastapi main2:app --host=0.0.0.0 --port=10000"
+  env:web
+  plan:free
+  
