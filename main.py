@@ -53,8 +53,9 @@ def search(params):
         logging.error(f"Error parsing JSON response: {json_err}")
 
 @app.get('/search/{keyword}/{date}')
-def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
-    
+def search_tweets(keyword:str,date:str,from_date:str|None = None,limit:int = 1,checkAlive:bool = False):
+    if from_date:
+        keyword = f"{keyword} since:{from_date}"
     EarlyTweets = []
     if checkAlive:
         logging.info('Checking if Api is Alive')
