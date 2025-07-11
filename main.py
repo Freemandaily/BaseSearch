@@ -16,13 +16,8 @@ app = FastAPI()
 header = {
             "X-API-Key": API_KEY
         }
-params = {
-            "query": '',  
-            'cursor':"",
-            'hash_next_page':True
-            }
 
-def search():
+def search(params):
     all_tweets = []
     try:
         while True:
@@ -59,6 +54,7 @@ def search():
 
 @app.get('/search/{keyword}/{date}')
 def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
+    
     EarlyTweets = []
     if checkAlive:
         logging.info('Checking if Api is Alive')
@@ -67,11 +63,16 @@ def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
     while True:
         hour += 1
         keyword_date = f"{keyword} until:{date}_{hour}:00:00_UTC"
+        params = {
+            "query": keyword_date,
+            'cursor':"",
+            'hash_next_page':True
+            }
         params['query'] = keyword_date
         if hour == 24:
             logging.warning("Reached 24 hours limit, stopping search.")
             return {'Error': 'No tweets found for the given query. Change the keyword or date.'}
-        all_tweets= search()
+        all_tweets= search(params)
         if all_tweets:
             logging.info(f"Fetched {len(all_tweets)} tweets for keyword: {keyword_date}")
             break
@@ -80,6 +81,11 @@ def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
             break
         EarlyTweets.append(tweet)
     return EarlyTweets     
+
+
+
+
+
 
 
 
