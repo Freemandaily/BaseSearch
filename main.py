@@ -8,6 +8,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+
 API_KEY =  os.environ.get('ApiKey')
 BASE_URL = "https://api.twitterapi.io/twitter/tweet/advanced_search"
 app = FastAPI()
@@ -68,6 +69,9 @@ def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
         hour += 1
         keyword_date = f"{keyword} until:{date}_{hour}:00:00_UTC"
         searcher.params['query'] = keyword_date
+        if hour == 24:
+            logging.warning("Reached 24 hours limit, stopping search.")
+            return {'Error': 'No tweets found for the given query. Change the keyword or date.'}
         search()
         if searcher.all_tweets:
             logging.info(f"Fetched {len(searcher.all_tweets)} tweets for keyword: {keyword_date}")
