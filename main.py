@@ -21,9 +21,9 @@ params = {
             'cursor':"",
             'hash_next_page':True
             }
-all_tweets = []
-EarlyTweets = []
+
 def search():
+    all_tweets = []
     try:
         while True:
             # Make the GET request to the TwitterAPI.io endpoint
@@ -32,6 +32,8 @@ def search():
             tweets = data.get('tweets', [])
             if not tweets:
                 logging.info("No tweets found for the given query. Checking Next Hours Tweets")
+                if all_tweets:
+                    return all_tweets
                 break
             for tweet in tweets:
                 tweet_info = {
@@ -43,10 +45,11 @@ def search():
                 all_tweets.append(tweet_info)
             if not data['next_cursor']:
                 logging.warning("No more tweets found or reached the end of results.")
-                break
+                return all_tweets
 
             params['cursor'] = data['next_cursor']
             logging.info(f"Fetched {len(data['tweets'])} tweets, moving to next page...") 
+    
     except requests.exceptions.HTTPError as http_err:
         logging.error(f"HTTP error occurred: {http_err}")
     except requests.exceptions.RequestException as err:
@@ -56,6 +59,7 @@ def search():
 
 @app.get('/search/{keyword}/{date}')
 def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
+    EarlyTweets = []
     if checkAlive:
         logging.info('Checking if Api is Alive')
         return {'Status':200}
@@ -67,7 +71,7 @@ def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
         if hour == 24:
             logging.warning("Reached 24 hours limit, stopping search.")
             return {'Error': 'No tweets found for the given query. Change the keyword or date.'}
-        search()
+        all_tweets= search()
         if all_tweets:
             logging.info(f"Fetched {len(all_tweets)} tweets for keyword: {keyword_date}")
             break
@@ -76,4 +80,6 @@ def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
             break
         EarlyTweets.append(tweet)
     return EarlyTweets     
+
+
 
