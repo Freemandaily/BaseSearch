@@ -39,7 +39,7 @@ def search():
                 break
             for tweet in tweets:
                 tweet_info = {
-                    "userName": tweet.get("userName"),
+                    "userName": tweet.get("author", {}).get("userName"),
                     "text": tweet.get("text"),
                     "createdAt": tweet.get("createdAt"),
                     'tweet_link': tweet.get('url')
