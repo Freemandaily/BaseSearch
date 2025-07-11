@@ -13,26 +13,21 @@ API_KEY =  os.environ.get('ApiKey')
 BASE_URL = "https://api.twitterapi.io/twitter/tweet/advanced_search"
 app = FastAPI()
 
-class TweetSearch:
-    def __init__(self,api_key):
-        self.header = {
-            "X-API-Key": api_key
+header = {
+            "X-API-Key": API_KEY
         }
-        self.params = {
+params = {
             "query": '',  
             'cursor':"",
             'hash_next_page':True
             }
-        self.all_tweets = []
-        self.EarlyTweets = []
-
-
-searcher = TweetSearch(API_KEY)
+all_tweets = []
+EarlyTweets = []
 def search():
     try:
         while True:
             # Make the GET request to the TwitterAPI.io endpoint
-            response = requests.get(BASE_URL, headers=searcher.header, params=searcher.params)
+            response = requests.get(BASE_URL, headers=header, params=params)
             data = response.json()
             tweets = data.get('tweets', [])
             if not tweets:
@@ -45,12 +40,12 @@ def search():
                     "createdAt": tweet.get("createdAt"),
                     'tweet_link': tweet.get('url')
                 }
-                searcher.all_tweets.append(tweet_info)
+                all_tweets.append(tweet_info)
             if not data['next_cursor']:
                 logging.warning("No more tweets found or reached the end of results.")
                 break
 
-            searcher.params['cursor'] = data['next_cursor']
+            params['cursor'] = data['next_cursor']
             logging.info(f"Fetched {len(data['tweets'])} tweets, moving to next page...") 
     except requests.exceptions.HTTPError as http_err:
         logging.error(f"HTTP error occurred: {http_err}")
@@ -68,21 +63,17 @@ def search_tweets(keyword:str,date:str,limit:int = 1,checkAlive:bool = False):
     while True:
         hour += 1
         keyword_date = f"{keyword} until:{date}_{hour}:00:00_UTC"
-        searcher.params['query'] = keyword_date
+        params['query'] = keyword_date
         if hour == 24:
             logging.warning("Reached 24 hours limit, stopping search.")
             return {'Error': 'No tweets found for the given query. Change the keyword or date.'}
         search()
-        if searcher.all_tweets:
-            logging.info(f"Fetched {len(searcher.all_tweets)} tweets for keyword: {keyword_date}")
+        if all_tweets:
+            logging.info(f"Fetched {len(all_tweets)} tweets for keyword: {keyword_date}")
             break
-    for tweet in reversed(searcher.all_tweets):
-        if len(searcher.EarlyTweets) == limit:
+    for tweet in reversed(all_tweets):
+        if len(EarlyTweets) == limit:
             break
-        searcher.EarlyTweets.append(tweet)
-    return searcher.EarlyTweets     
-
-
-
-
+        EarlyTweets.append(tweet)
+    return EarlyTweets     
 
