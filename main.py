@@ -18,6 +18,7 @@ header = {
         }
 
 def search(params):
+    from datetime import timedelta,datetime
     all_tweets = []
     try:
         while True:
@@ -31,10 +32,13 @@ def search(params):
                     return all_tweets
                 break
             for tweet in tweets:
+                dt = datetime.strptime(tweet.get("createdAt"), "%a %b %d %H:%M:%S %z %Y")
+                date_utc_plus_one = dt + timedelta(hours=1)
+                tweet_date = date_utc_plus_one.strftime("%a %b %d %H:%M:%S %z %Y")
                 tweet_info = {
                     "userName": tweet.get("author", {}).get("userName"),
                     "text": tweet.get("text"),
-                    "createdAt": tweet.get("createdAt"),
+                    "createdAt": tweet_date,
                     'tweet_link': tweet.get('url')
                 }
                 all_tweets.append(tweet_info)
@@ -82,9 +86,6 @@ def search_tweets(keyword:str,date:str,from_date:str|None = None,limit:int = 1,c
             break
         EarlyTweets.append(tweet)
     return EarlyTweets     
-
-
-
 
 
 
