@@ -1,4 +1,4 @@
-import requests
+import requests,re
 import logging,os
 from datetime import datetime
 from fastapi import FastAPI
@@ -102,7 +102,6 @@ def link_search(tweet_id:str):
     if response.status_code == 200:
         result = response.json()
         tweets = result['tweets']
-        print(tweets)
         
         if tweets:
             dt = datetime.strptime(tweets[0]["createdAt"], "%a %b %d %H:%M:%S %z %Y")
@@ -118,7 +117,6 @@ def link_search(tweet_id:str):
                 'date_tweeted':tweet_date,
                 'followers':tweets[0]['author']['followers']
             }
-            print(tweet_info)
             return tweet_info
         else:
             return {'Error':'Couldnt Search With This Link'}
@@ -135,7 +133,6 @@ def search_with_link(url:str):
         try:
             tweet_id = url.split('/')[-1]
             username = url.split('/')[-3]
-            print(tweet_id)
             if len(tweet_id) == 19 and isinstance(int(tweet_id),int):
                 tweet_data = link_search(tweet_id=tweet_id)
                 return tweet_data
@@ -145,7 +142,6 @@ def search_with_link(url:str):
             return {'Error':'Invalid X link'}
     else:
         return {'Error': 'Invalid X Link: Link is not X link'}
-
 
     
 
