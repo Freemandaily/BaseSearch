@@ -90,4 +90,61 @@ def search_tweets(keyword:str,date:str,from_date:str|None = None,limit:int = 1,c
 
 
 
+def link_search(tweet_id:str):
+    logging.info(f'Searchig Tweet With Id')
+    from datetime import datetime,timedelta
+    url = f"https://api.twitterapi.io/twitter/tweets?tweet_ids={tweet_id}"
+        
+    header = {
+                "X-API-Key": API_KEY
+            }
+    response = requests.get(url=url,headers=header)
+    if response.status_code == 200:
+        result = response.json()
+        tweets = result['tweets']
+        
+        if tweets:
+            dt = datetime.strptime(tweets[0]["createdAt"], "%a %b %d %H:%M:%S %z %Y")
+            date_utc_plus_one = dt + timedelta(hours=1)
+            tweet_date = date_utc_plus_one.strftime("%Y-%m-%d %H:%M:%S")
+            contract_patterns = r'\b(0x[a-fA-F0-9]{40}|[1-9A-HJ-NP-Za-km-z]{32,44}|T[1-9A-HJ-NP-Za-km-z]{33})\b'
+            ticker_partterns = r'\$[A-Za-z0-9_-]+'
+            ticker_names = re.findall(ticker_partterns,tweets[0]['text'])
+            contracts  = re.findall(contract_patterns,tweets[0]['text']) 
+            tweet_info = {
+                'ticker_names':ticker_names,
+                'contracts':contracts,
+                'date_tweeted':tweet_date,
+                'followers':tweets[0]['author']['followers']
+            }
+            return tweet_info
+        else:
+            return {'Error':'Couldnt Search With This Link'}
+    else:
+        print(response.status_code)
+        return {'Error': f'Couldnt Search With Link. Code {response.status_code}'}
+
+
+
+@app.get('/link_search')
+def search_with_link(url:str):
+    url = url.lower()
+    if url.startswith('https://x.com/'):
+        try:
+            tweet_id = url.split('/')[-1]
+            username = url.split('/')[-3]
+            if len(tweet_id) == 19 and isinstance(int(tweet_id),int):
+                tweet_data = link_search(tweet_id=tweet_id)
+                return tweet_data
+            else:
+                return {'Error':'Invalid X Link'}
+        except:
+            return {'Error':'Invalid X link'}
+    else:
+        return {'Error': 'Invalid X Link'}
+
+
+
+
+
 
