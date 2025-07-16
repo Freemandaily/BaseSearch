@@ -90,9 +90,10 @@ def search_tweets(keyword:str,date:str,from_date:str|None = None,limit:int = 1,c
 
 
 
+
 def link_search(tweet_id:str):
-    logging.info(f'Searchig Tweet With Id')
     from datetime import datetime,timedelta
+    logging.info(f'Searchig Tweet With Id')
     url = f"https://api.twitterapi.io/twitter/tweets?tweet_ids={tweet_id}"
         
     header = {
@@ -137,14 +138,14 @@ def search_with_link(url:str):
                 tweet_data = link_search(tweet_id=tweet_id)
                 return tweet_data
             else:
-                return {'Error':'Invalid X Link'}
+                return {'Error':'Invalid Tweet_id'}
         except:
             return {'Error':'Invalid X link'}
     else:
-        return {'Error': 'Invalid X Link'}
+        return {'Error': 'Invalid X Link: Link is not X link'}
 
 
-
+    
 
 
 
