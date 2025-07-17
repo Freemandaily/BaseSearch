@@ -290,7 +290,7 @@ def process_timeframe(input_string):
             result.append(int(item))
     return sorted(result)
 
-
+# Search Tweet and grab Ticker mentioned then Get price price Using Tweet date time
 @app.get("/link")
 def process_link(tweet_url:str,timeframe:str):
     timeframes = process_timeframe(timeframe)
@@ -311,6 +311,22 @@ def process_link(tweet_url:str,timeframe:str):
         ticker_price_data.append({'date_tweeted':tweeted_date})
         return ticker_price_data
 
+    ticker_price_data = asyncio.run(main())
+    return ticker_price_data
+
+#Search Ticker On  Cex
+@app.get("/ticker")
+def process_link(tickers:str,start_date:str,timeframe:str):
+    logging.info('Ready To Search Ticker On Cex')
+    timeframes = process_timeframe(timeframe)
+    tickers = list(set(tickers.split()))
+    start_date_time = str(start_date)
+    
+    async def main():
+        search_tasks = [Bybit_Price_data(symbol=ticker,timeframes=timeframes,start_date_time=start_date_time) for ticker in tickers]
+        ticker_price_data = await asyncio.gather(*search_tasks)
+        ticker_price_data.append({'date_tweeted':start_date_time})
+        return ticker_price_data
     ticker_price_data = asyncio.run(main())
     return ticker_price_data
 
