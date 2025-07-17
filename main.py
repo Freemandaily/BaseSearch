@@ -303,7 +303,7 @@ def process_link(tweet_url:str,timeframe:str):
     result = reaponse.json()
     ticker_names = result['ticker_names']
     ticker_names =  list(set([ticker[1:] for ticker in ticker_names]))
-    tweeted_date = result['date_tweeted']
+    tweeted_date = result['date_tweeted'][:-3]+':00'
     async def main():
         search_tasks = [Bybit_Price_data(symbol=ticker,timeframes=timeframes,start_date_time=tweeted_date) for ticker in ticker_names]
         ticker_price_data = await asyncio.gather(*search_tasks)
