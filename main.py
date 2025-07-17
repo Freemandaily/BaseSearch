@@ -313,7 +313,6 @@ def process_link(tweet_url:str,timeframe:str):
     ticker_price_data = asyncio.run(main())
     return ticker_price_data
 
-
     
 
 
