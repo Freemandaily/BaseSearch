@@ -79,18 +79,18 @@ def search_tweets(keyword:str,date:str,from_date:str|None = None,limit:int = 1,c
         params['query'] = keyword_date
         if hour == 24:
             logging.warning("Reached 24 hours limit, stopping search.")
+            if all_tweets:
+                break
             return {'Error': 'No tweets found for the given query. Change the keyword or date.'}
         all_tweets= search(params)
-        if all_tweets:
+        if all_tweets and len(all_tweets) >= limit:
             logging.info(f"Fetched {len(all_tweets)} tweets for keyword: {keyword_date}")
             break
     for tweet in reversed(all_tweets):
         if len(EarlyTweets) == limit:
             break
         EarlyTweets.append(tweet)
-    return EarlyTweets     
-
-
+    return EarlyTweets 
 
 
 def link_search(tweet_id:str):
