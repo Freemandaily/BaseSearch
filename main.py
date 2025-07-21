@@ -230,7 +230,7 @@ async def Fetch_Price(session,params,end_time,limit):
 async def fetch_symbol(symbol:str):
     logging.info('Fetcing Symbol From Bybit')
     # url = 'https://bybit-ohlcv.onrender.com/bybit/tickers'
-    url = 'https://bybit-ohlcv2.onrender.com/bybit/ticker'
+    url = 'https://bybit-ohlcv2.onrender.com/bybit/tickers'
     params = {
         'symbol':symbol
     }
