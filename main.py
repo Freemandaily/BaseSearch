@@ -297,7 +297,8 @@ def process_timeframe(input_string):
 def process_link(tweet_url:str,timeframe:str):
     timeframes = process_timeframe(timeframe)
     logging.info('Ready To Search Tweet With Tweet Link')
-    url = 'https://basesearch.onrender.com/link_search/'
+    # url = 'https://basesearch.onrender.com/link_search/'
+    url = 'https://basesearch-fscd.onrender.com/link_search/'
     params = {
         'url':tweet_url
     }
