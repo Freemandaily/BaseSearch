@@ -213,7 +213,7 @@ async def Fetch_Price(session,params,end_time,limit):
     params['end_time'] = end_time
     params['limit'] = limit
     prices_info = []
-     url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
+    url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
     while True:
         async with session.get(url=url,params=params) as response:
             if response.status == 200:
