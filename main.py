@@ -206,26 +206,57 @@ async def Process_price_Data(price_data):
      
 
 
-
-
 async def Fetch_Price(session,params,end_time,limit):
     logging.info('Fetching Prices')
+    searchCount = 0
+    expectedSearch = (limit/1000) + 1
     params['end_time'] = end_time
     params['limit'] = limit
-    # url = 'https://bybit-ohlcv.onrender.com/bybit/ohlcv'
-    url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
+    prices_info = []
+     url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
+    while True:
+        async with session.get(url=url,params=params) as response:
+            if response.status == 200:
+                await asyncio.sleep(4)
+                result = await response.json()
+                if result['result']:
+                    searchCount += 1
+                    price_data = result['result']['list']
+                    prices_info = prices_info + price_data
+                    if len(prices_info) >= limit:
+                        return {'Timeframe_minute':{limit:prices_info},'start_time':params['start_time'],'end_time':end_time}
+                    elif searchCount >= expectedSearch:
+                        return prices_info
+                    else:
+                        first_entry = price_data[-1]
+                        params['end_time'] = first_entry[0]
+                        continue
+                else:
+                    logging.error(f'Empty Price Data. Check Your Parameters')
+                    return {'Error':f'Empty Price Data. Check Your Parameters'}
+            else:
+                logging.error(f'Unable to Fetch Price: code= {response.status }')
+                return {'Error':f'Unable to Fetch Price: code= {response.status }'}
+
+
+# async def Fetch_Price(session,params,end_time,limit):
+#     logging.info('Fetching Prices')
+#     params['end_time'] = end_time
+#     params['limit'] = limit
+#     # url = 'https://bybit-ohlcv.onrender.com/bybit/ohlcv'
+#     url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
    
-    async with session.get(url=url,params=params) as response:
-        if response.status == 200:
-            await asyncio.sleep(4)
-            result = await response.json()
-            if result['result']:
-                price_data = result['result']['list']
-                return {'Timeframe_minute':{limit:price_data},'start_time':params['start_time'],'end_time':end_time}
-            logging.error(f'Empty Price Data. Check Your Parameters')
-            return {'Error':f'Empty Price Data. Check Your Parameters'}
-        logging.error(f'Unable to Fetch Price: code= {response.status }')
-        return {'Error':f'Unable to Fetch Price: code= {response.status }'}
+#     async with session.get(url=url,params=params) as response:
+#         if response.status == 200:
+#             await asyncio.sleep(4)
+#             result = await response.json()
+#             if result['result']:
+#                 price_data = result['result']['list']
+#                 return {'Timeframe_minute':{limit:price_data},'start_time':params['start_time'],'end_time':end_time}
+#             logging.error(f'Empty Price Data. Check Your Parameters')
+#             return {'Error':f'Empty Price Data. Check Your Parameters'}
+#         logging.error(f'Unable to Fetch Price: code= {response.status }')
+#         return {'Error':f'Unable to Fetch Price: code= {response.status }'}
 
 async def fetch_symbol(symbol:str):
     logging.info('Fetcing Symbol From Bybit')
