@@ -226,7 +226,7 @@ async def Fetch_Price(session,params,end_time,limit):
                     if len(prices_info) >= limit:
                         return {'Timeframe_minute':{limit:prices_info},'start_time':params['start_time'],'end_time':end_time}
                     elif searchCount >= expectedSearch:
-                        return prices_info
+                        return {'Timeframe_minute':{limit:prices_info},'start_time':params['start_time'],'end_time':end_time}
                     else:
                         first_entry = price_data[-1]
                         params['end_time'] = first_entry[0]
