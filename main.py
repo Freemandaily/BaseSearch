@@ -215,7 +215,8 @@ async def Fetch_Price(session,params,end_time,limit):
     params['end_time'] = end_time
     params['limit'] = limit
     prices_info = []
-    url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
+    # url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
+    url = 'https://bybit-ohlcv-170603173514.europe-west3.run.app/bybit/ohlcv'
     while True:
         async with session.get(url=url,params=params) as response:
             if response.status == 200:
@@ -263,7 +264,8 @@ async def Fetch_Price(session,params,end_time,limit):
 async def fetch_symbol(symbol:str):
     logging.info('Fetcing Symbol From Bybit')
     # url = 'https://bybit-ohlcv.onrender.com/bybit/tickers'
-    url = 'https://bybit-ohlcv2.onrender.com/bybit/tickers'
+    # url = 'https://bybit-ohlcv2.onrender.com/bybit/tickers'
+    url = 'https://bybit-ohlcv-170603173514.europe-west3.run.app/bybit/tickers'
     params = {
         'symbol':symbol
     }
@@ -331,7 +333,8 @@ def process_link(tweet_url:str,timeframe:str):
     timeframes = process_timeframe(timeframe)
     logging.info('Ready To Search Tweet With Tweet Link')
     # url = 'https://basesearch.onrender.com/link_search/'
-    url = 'https://basesearch2.onrender.com/link_search/'
+    # url = 'https://basesearch2.onrender.com/link_search/'
+    url = 'https://basesearch-170603173514.europe-west3.run.app/link_search/'
     params = {
         'url':tweet_url
     }
