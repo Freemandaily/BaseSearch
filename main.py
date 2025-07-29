@@ -216,7 +216,8 @@ async def Fetch_Price(session,params,end_time,limit):
     params['limit'] = limit
     prices_info = []
     # url = 'https://bybit-ohlcv2.onrender.com/bybit/ohlcv'
-    url = 'https://bybit-ohlcv-170603173514.europe-west3.run.app/bybit/ohlcv'
+    
+    url = https://bybit-ohlcv-170603173514.europe-west1.run.app/bybit/ohlcv'
     while True:
         async with session.get(url=url,params=params) as response:
             if response.status == 200:
@@ -265,7 +266,7 @@ async def fetch_symbol(symbol:str):
     logging.info('Fetcing Symbol From Bybit')
     # url = 'https://bybit-ohlcv.onrender.com/bybit/tickers'
     # url = 'https://bybit-ohlcv2.onrender.com/bybit/tickers'
-    url = 'https://bybit-ohlcv-170603173514.europe-west3.run.app/bybit/tickers'
+    url = 'https://bybit-ohlcv-170603173514.europe-west1.run.app/bybit/tickers'
     params = {
         'symbol':symbol
     }
