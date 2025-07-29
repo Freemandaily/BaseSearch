@@ -335,7 +335,7 @@ def process_link(tweet_url:str,timeframe:str):
     logging.info('Ready To Search Tweet With Tweet Link')
     # url = 'https://basesearch.onrender.com/link_search/'
     # url = 'https://basesearch2.onrender.com/link_search/'
-    url = 'https://basesearch-170603173514.europe-west3.run.app/link_search/'
+    url = 'https://basesearch-170603173514.europe-west1.run.app/link_search/'
     params = {
         'url':tweet_url
     }
