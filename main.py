@@ -372,7 +372,7 @@ def process_link(tickers:str,start_date:str,timeframe:str):
 
 
 
-@app.get('/rapid_search/')
+@app.get("/rapid_search")
 def rapid():
         
     
@@ -408,6 +408,7 @@ def rapid():
         else:
             print(f"Error: {response.status_code}")
             break
+
 
 
 
