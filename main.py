@@ -371,3 +371,43 @@ def process_link(tickers:str,start_date:str,timeframe:str):
     return ticker_price_data
 
 
+
+@app.get('/rapid_search/')
+def rapid():
+        
+    
+    RAPID_API_KEY = os.environ.get('RAPID_API_KEY')
+
+    url = f'http://twitter-api45.p.rapidapi.com/search.php?search_type=Top'
+
+    # '/search-v2?type=Top&count=20&query=%24noom%20until%3A2025-08-11%20since%3A2025-08-10'
+    headers = {
+        'x-rapidapi-host': 'twitter-api45.p.rapidapi.com',
+        'x-rapidapi-key': RAPID_API_KEY  ,
+        'Host': 'twitter-api45.p.rapidapi.com'
+    }
+
+    params = {
+        'query': '$swif until:2025-08-06_10:00:00_UTC since:2025-08-06_09:30:00_UTC',
+        'cursor': 'DAACCgACGyFQAF2AJxAKAAMbIVAAXX88sAgABAAAAAILAAUAAAG8RW1QQzZ3QUFBZlEvZ0dKTjB2R3AvQUFBQUNjYkdvejVkQmF3Q0JzYWp5blEyc0JFR3hxTTMzQmF3SndiR295TEdsdEIzeHNhamJhQTJzQnJHeHFMWEF5YXdjc2JHbysrVHRiZ1loc2FqOFFuVnpDREd4cU4rM1JYQUhFYkdvNmpBRmNBblJzYWp0YXVtc0I2R3hxT0dzZFgwZUViR296a1lwWmhLUnNhalpxcmx2RnRHeHFOb3l3V29IWWJHbzh1Z3BkQitoc2FqZStXbHhCV0d4cU1LWFdYa2NJYkdvelR4TnJBc2hzYWpRbm0yc0IrR3hxTmF4SFc0WkliR28vNnI1Y2dOeHNhamhNK21xSGRHeHFPUXZlYXdlOGJHb3R3Y2RyQWtSc2FqbERCVmxEU0d4cU9DTk1YSVRBYkdvL3pGVlpBQnhzYWtGSmdGb0EwR3hxUUtrQmF3TDBiR3BBNVY1ZGhqQnNha1Y2cjEyQytHeHFQRTQ4VzRYVWJHcEJqdFpiaGdoc2FqYk5QRjVHZEd4cU85WXJYc2NZYkdvd1JJVllRRkJzYWpMbWcyc0dWR3hxTnJFeVhBSG89CAAGAAAAAAgABwAAAAQMAAgKAAEbGo8TjxbhdQAAAA'
+    }
+    while True:
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            return data
+            
+            if  data['next_cursor'] and params['cursor'] == data['next_cursor']:
+                print("No more data to fetch, breaking the loop.")
+                break
+            elif 'next_cursor' in data and data['next_cursor'] != None:
+                params['cursor'] = data['next_cursor']
+                print( params['cursor'] )
+            else:
+                break
+        else:
+            print(f"Error: {response.status_code}")
+            break
+
+
+
